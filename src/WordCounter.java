@@ -1,10 +1,11 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WordCounter {
     public static void main(String[] args) {
@@ -14,15 +15,15 @@ public class WordCounter {
         String fileAdress = null;
         System.out.println("Введите адрес файла:");
         try {
-            fileAdress = systemInReader.readLine();
+            fileAdress = systemInReader.readLine().trim();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Некорректный ввод");
         }
 
         //Создание списка потенциальных адресов файла в случае ввода относительного пути вида "file.txt" или "/file.txt"
-        //и соответствующий перебор значений. В случае неудовлетворительного результата, требуется запустить программу 
-        //заново.
+        //и соответствующий перебор значений. В случае неудовлетворительного результата, требуется запустить программу
+        // заново.
         //Также предусмотрена работа в Windows (в адресе используется обратная косая черта "\")
         List<String> adresses = new ArrayList<>();
         adresses.add(fileAdress);
@@ -45,6 +46,7 @@ public class WordCounter {
 
         //построчный анализ файла, поиск по шаблону и добавление найденных слов в TreeMap, вывод списка в консоль
         String regex = "[а-яА-Яa-zA-Z]+";       //шаблон поиска
+        int max = 0;                            //наибольшее количество повторений
         try {
             BufferedReader readFile = new BufferedReader(new InputStreamReader(fileIn));
             while (readFile.ready()) {
@@ -52,11 +54,13 @@ public class WordCounter {
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(input);
                 while(matcher.find()) {
-                    String word = (input.substring(matcher.start(), matcher.end()));
+                    String word = (input.substring(matcher.start(), matcher.end())).toLowerCase();
                     if (mapp.containsKey(word)) {
                         int value = mapp.get(word);
                         value++;
                         mapp.put(word, value);
+                        if (value > max)
+                            max = value;
                     } else {
                         mapp.put(word, 1);
                     }
@@ -65,9 +69,10 @@ public class WordCounter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        int finalMax = max;
+        mapp.entrySet().stream().filter(pair -> pair.getValue() == finalMax).forEach(pair ->
+                System.out.println(pair.getKey() + ": " + pair.getValue()));
 
-        for (Map.Entry<String, Integer> pair : mapp.entrySet()) {
-            System.out.println(pair.getKey() + ": " + pair.getValue());
-        }
     }
 }
