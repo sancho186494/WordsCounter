@@ -1,11 +1,7 @@
 import java.io.*;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class WordCounter {
     public static void main(String[] args) {
@@ -69,10 +65,13 @@ public class WordCounter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
+        System.out.println("-----------Статистика по всем словам-----------");
+        mapp.forEach((key, value) -> System.out.println(key + ": " + value));
+
+        System.out.println("-----------Слова с наибольшим количеством повторений-----------");
         int finalMax = max;
         mapp.entrySet().stream().filter(pair -> pair.getValue() == finalMax).forEach(pair ->
                 System.out.println(pair.getKey() + ": " + pair.getValue()));
-
     }
 }
